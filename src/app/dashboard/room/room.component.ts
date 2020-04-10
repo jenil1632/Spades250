@@ -11,7 +11,7 @@ import { Socket } from 'ngx-socket-io';
 })
 export class RoomComponent implements OnInit {
 
-  constructor(private signupService: SignupService, private router: Router, private socket: Socket) { }
+  constructor(private router: Router, private socket: Socket) { }
 
   createRoom = false;
   joinRoom = false;
@@ -37,7 +37,7 @@ create(){
       console.log(res);
       if(res.message === 'success'){
         alert('Room created successfully');
-        this.router.navigate(['/board']);
+        this.router.navigate(['/board'], {queryParams: {room: this.newRoomName.value}});
       }
     });
   }
@@ -48,7 +48,7 @@ create(){
       this.socket.emit('joinRoom', {roomName: this.existingRoomName.value, username: sessionStorage.getItem('spadesUsername')}, (res)=> {
         if(res.message === 'success'){
           alert(`Joined Room ${this.existingRoomName.value}`);
-          this.router.navigate(['/board']);
+          this.router.navigate(['/board'], {queryParams: {room: this.newRoomName.value}});
         }
         else {
           alert('This room does not exist');

@@ -5,7 +5,7 @@ const path = require('path');
 const publicPath = path.join(__dirname, '../public');
 const socketIO = require('socket.io');
 const http = require('http');
-const game = require('./game.js');
+const {Game} = require('./game.js');
 //const {generateMessage} = require('./utils/message.js');
 
 
@@ -31,13 +31,6 @@ app.post('/signup', (req, res)=>{
   playerArray.push(name);
   res.status(200).send({message: "success", username: name});
 });
-
-
-app.get('/startgame', (req, res)=>{
-  if(connections>=5){
-
-  }
-})
 
 
 //messaging app event listener
@@ -87,7 +80,14 @@ io.on('connection', (socket)=>{
     if(room.connections >== 4) {
       room.gameOn = true;
       io.sockets.in(room.name).emit('toast', {message: 'Game Started!'});
-      game.startgame(connections, playerArray);
+      const game = new Game();
+      game.startgame(connections, playerArray).then(()=>{
+        game.allPlayers.forEach(player => {
+          io.to(player.id).emit('cards', {hand: player.hand});
+        });
+      }).catch(()=>{
+        io.sockets.in(room.name).emit('toast', {message: 'Error loading game'});
+      });
     }
     else {
       io.to(socket.id).emit('toast', {message: 'Waiting for 4 or more players to join'});
@@ -107,8 +107,4 @@ server.listen(port, ()=>{
 
 function promptBid(player) {
 
-}
-
-module.export = {
-  promptBid: promptBid
 }

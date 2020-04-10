@@ -11,6 +11,7 @@ import { SignupComponent } from './dashboard/signup/signup.component';
 
 import { SignupService } from './services/signup.service';
 import { RoomComponent } from './dashboard/room/room.component';
+import { BoardComponent } from './dashboard/board/board.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
@@ -19,7 +20,8 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     AppComponent,
     DashboardComponent,
     SignupComponent,
-    RoomComponent
+    RoomComponent,
+    BoardComponent
   ],
   imports: [
     BrowserModule,
