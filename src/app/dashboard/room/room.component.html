@@ -1,0 +1,6 @@
+<button (click)="showCreateRoomInput()">Create Room</button>
+<input type="text" placeholder="Type here" [formControl]="newRoomName" *ngIf="createRoom"/>
+<button type="submit" (click)="create()">Create</button>
+<button (click)="showJoinRoomInput()">Join Room</button>
+<input type="text" placeholder="Type here" [formControl]="existingRoomName" *ngIf="joinRoom"/>
+<button type="submit" (click)="join()">Join</button>
