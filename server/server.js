@@ -28,7 +28,6 @@ app.get('/sellerprofile/:name', (req, res)=>{
 
 app.post('/signup', (req, res)=>{
   let name = req.body.username;
-  playerArray.push(name);
   res.status(200).send({message: "success", username: name});
 });
 
@@ -42,10 +41,12 @@ io.on('connection', (socket)=>{
     let player = playerArray.find(p => p.id === socket.id);
     playerArray = playerArray.filter(p => p.id !== socket.id);
     let room = roomList.find(r => r.name === player.roomName);
-    room.connections--;
-    socket.broadcast.to(room.name).emit('toast', {message: `${player.name} left!`})
-    if(room.connections === 0) {
-      roomList = roomList.filter(r => r.name !== room.name);
+    if(room) {
+      room.connections--;
+      socket.broadcast.to(room.name).emit('toast', {message: `${player.name} left!`})
+      if(room.connections === 0) {
+        roomList = roomList.filter(r => r.name !== room.name);
+      }
     }
     console.log('user was disconnected');
   });
@@ -77,17 +78,16 @@ io.on('connection', (socket)=>{
 
   socket.on('startgame', (data, callback)=>{
     let room = roomList.find(room => room.name === data.roomName);
-    if(room.connections >== 4) {
+    if(room && room.connections >= 1) {
       room.gameOn = true;
       io.sockets.in(room.name).emit('toast', {message: 'Game Started!'});
       const game = new Game();
-      game.startgame(connections, playerArray).then(()=>{
-        game.allPlayers.forEach(player => {
+      game.startgame(room.connections, playerArray);
+      game.allPlayers.forEach(player => {
           io.to(player.id).emit('cards', {hand: player.hand});
         });
-      }).catch(()=>{
-        io.sockets.in(room.name).emit('toast', {message: 'Error loading game'});
-      });
+      let starter = Math.floor(Math.random()*room.connections);
+        io.to(game.allPlayers[starter].id).emit('bid', {value: 150});
     }
     else {
       io.to(socket.id).emit('toast', {message: 'Waiting for 4 or more players to join'});
@@ -104,7 +104,3 @@ io.on('connection', (socket)=>{
 server.listen(port, ()=>{
   console.log(`Connected on ${port}`);
 });
-
-function promptBid(player) {
-
-}

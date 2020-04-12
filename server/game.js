@@ -2,93 +2,71 @@ function Game() {
   this.cardArray = [];
   this.removedCardsArray = [];
   this.allPlayers = [];
-  this.startgame = startgame;
 }
 let {Player} = require('./models/player.js');
-let cardArray = [];
-let removedCardsArray = [];
-let allPlayers = [];
 
-async function startgame(players, playerArray){
-  return new Promise(function(resolve, reject) {
-    await initalizeCardArray();
-    await removeCardsBeforeGame(players);
-    await createPlayers(players, playerArray);
-    await distributeCards(players);
-    resolve("Stuff worked!");
-});
+Game.prototype.startgame = function(players, playerArray) {
+    this.initalizeCardArray();
+    this.removeCardsBeforeGame(players);
+    this.createPlayers(players, playerArray);
+    this.distributeCards(players);
 }
 
-function removeCardsBeforeGame(players) {
-  return new Promise(function(resolve, reject) {
+Game.prototype.removeCardsBeforeGame = function(players) {
     let cardsTobeRemoved = 52 % players;
-    while(cardArray.length > 52-cardsTobeRemoved){
-      let randomCard = Math.round(Math.random()*52) + 1;
+    while(this.cardArray.length > 52-cardsTobeRemoved){
+      let randomCard = Math.floor(Math.random()*52) + 1;
       if(randomCard !== 3){
-        if(cardExistsInDeck(randomCard)){
-          cardArray = cardArray.filter((elem) => {
+        if(this.cardExistsInDeck(randomCard)){
+          this.cardArray = this.cardArray.filter((elem) => {
             return elem !== randomCard;
           });
-          removedCardsArray.push(randomCard);
+          this.removedCardsArray.push(randomCard);
         }
       }
-    }
-    resolve("Stuff worked!");
-});
+}
 }
 
-function initalizeCardArray(){
-  return new Promise(function(resolve, reject) {
+Game.prototype.initalizeCardArray = function() {
     for(let i=1; i<=52; i++){
-      cardArray.push(i);
+      this.cardArray.push(i);
     }
-    resolve("Stuff worked!");
-});
 }
 
-function cardExistsInDeck(card){
-  for(let i=0; i<cardArray.length; i++){
-    if(cardArray[i]==card)
+Game.prototype.cardExistsInDeck = function (card){
+  for(let i=0; i<this.cardArray.length; i++){
+    if(this.cardArray[i]==card)
     return true;
   }
   return false;
 }
 
-function createPlayers(players, playerArray){
-  return new Promise(function(resolve, reject) {
-    for(let i=0; i<=players; i++){
-      allPlayers.push(new Player(playerArray[i].name, playerArray[i].id, playerArray[i].roomName));
+Game.prototype.createPlayers = function(players, playerArray){
+    for(let i=0; i<players; i++){
+      this.allPlayers.push(new Player(playerArray[i].name, playerArray[i].id, playerArray[i].roomName));
     }
-    resolve("Stuff worked!");
-});
 }
 
-function distributeCards(players){
-  return new Promise(function(resolve, reject) {
-    let handLength = cardArray.length / players;
-    for(let i=1; i<=players; i++){
+Game.prototype.distributeCards = function(players){
+    let handLength = this.cardArray.length / players;
+    for(let i=0; i<players; i++){
       let count = 0;
-      if(cardArray.length===handLength){
-        allPlayers[i].hand = cardArray;
+      if(this.cardArray.length===handLength){
+        this.allPlayers[i].hand = this.cardArray;
+        this.cardArray = [];
+        return;
       }
       while(count < handLength){
-        let randomCard = Math.round(Math.random()*52) + 1;
-        if(cardExistsInDeck(randomCard)){
-          cardArray = cardArray.filter((elem) => {
+        let randomCard = Math.floor(Math.random()*52) + 1;
+        if(this.cardExistsInDeck(randomCard)){
+          this.cardArray = this.cardArray.filter((elem) => {
             return elem !== randomCard;
           });
-          allPlayers[i].hand.push(randomCard);
+          this.allPlayers[i].hand.push(randomCard);
           count++;
         }
       }
     }
-    resolve("Stuff worked!");
-});
-}
-
-function startBidding(players) {
-  let randomPlayer = Math.round(Math.random()*players);
-  promptBid(allPlayers[randomPlayer]);
 }
 
 module.exports = {Game};

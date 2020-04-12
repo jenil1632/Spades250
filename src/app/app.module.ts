@@ -10,6 +10,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { SignupComponent } from './dashboard/signup/signup.component';
 
 import { SignupService } from './services/signup.service';
+import { GameService } from './services/game.service';
 import { RoomComponent } from './dashboard/room/room.component';
 import { BoardComponent } from './dashboard/board/board.component';
 
@@ -30,7 +31,7 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     HttpClientModule,
     SocketIoModule.forRoot(config)
   ],
-  providers: [SignupService],
+  providers: [SignupService, GameService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

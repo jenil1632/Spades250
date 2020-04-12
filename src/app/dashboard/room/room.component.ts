@@ -48,7 +48,7 @@ create(){
       this.socket.emit('joinRoom', {roomName: this.existingRoomName.value, username: sessionStorage.getItem('spadesUsername')}, (res)=> {
         if(res.message === 'success'){
           alert(`Joined Room ${this.existingRoomName.value}`);
-          this.router.navigate(['/board'], {queryParams: {room: this.newRoomName.value}});
+          this.router.navigate(['/board'], {queryParams: {room: this.existingRoomName.value}});
         }
         else {
           alert('This room does not exist');
