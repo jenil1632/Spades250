@@ -1,5 +1,5 @@
 <button type="button" (click) = startGame() *ngIf="!gameOn">Start game</button>
 
-<select [formControl]="myBid" *ngIf="gameOn">
-  <option *ngFor = "let val of allowedBidValues" [value]="val">{{val}}</option>
-</select>
+<input [formControl]="myBid" *ngIf="gameOn && !stopBid">
+<button type="button" (click) = "submitBid()" *ngIf="gameOn && !stopBid">Bid</button>
+<button type="button" (click) = "noChallenge()" *ngIf="gameOn && !stopBid">Pass</button>

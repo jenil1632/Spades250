@@ -2,6 +2,10 @@ function Game() {
   this.cardArray = [];
   this.removedCardsArray = [];
   this.allPlayers = [];
+  this.bid = 0;
+  this.bidder = {};
+  this.noChallenges = 0;
+  this.gameRoom = "";
 }
 let {Player} = require('./models/player.js');
 

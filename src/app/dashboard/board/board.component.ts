@@ -15,9 +15,11 @@ export class BoardComponent implements OnInit {
 
   room;
   myCards;
-  allowedBidValues = [];
+  minimumBid;
   myBid: FormControl;
   gameOn = false;
+  challenge = true;
+  stopBid = false;
 
   ngOnInit() {
     this.route.queryParams
@@ -38,14 +40,40 @@ export class BoardComponent implements OnInit {
       });
 
       this.gameService.promptBid().subscribe((res)=>{
-        for(let i=res.value; i<=250; i+=5){
-          this.allowedBidValues.push(i);
+        if(res.name !== sessionStorage.getItem('spadesUsername')){
+          if(this.challenge === true) {
+            console.log(`${res.name} has bid ${res.value}. Challenge ?`);
+          } else {
+            console.log(`${res.name} has bid ${res.value}.`);
+          }
         }
+        this.minimumBid = res.value;
       });
   }
 
   startGame() {
     this.socket.emit('startgame', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, ()=> {
+    });
+  }
+
+  submitBid() {
+    if(this.myBid.value <=250 && this.myBid.value > this.minimumBid && this.myBid.value%5===0) {
+      this.socket.emit('newBid', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), bid: this.myBid.value}, (res)=> {
+        if(res.message === 'success'){
+          this.minimumBid = this.myBid.value;
+          this.myBid.reset();
+        } else {
+          alert('Bid failed');
+        }
+      });
+    }
+  }
+
+  noChallenge() {
+    this.socket.emit('noChallenge', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
+      if(res.message === 'success') {
+        this.stopBid = true;
+      }
     });
   }
 
