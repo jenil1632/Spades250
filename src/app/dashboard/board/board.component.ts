@@ -17,6 +17,9 @@ export class BoardComponent implements OnInit {
   room;
   myCards;
   minimumBid;
+  turnIndex;
+  turnSuite = null;
+  mat = [];
   myBid: FormControl;
   gameOn = false;
   challenge = true;
@@ -53,6 +56,7 @@ export class BoardComponent implements OnInit {
 
       this.myBid = new FormControl(null);
       this.trump = new FormControl(null, Validators.required);
+      this.move = new FormControl(null, [Validators.required, validateMove]);
       this.partnerForm = new FormGroup({
         suite: new FormControl(null, Validators.required),
         card: new FormControl(null, Validators.required)
@@ -61,6 +65,7 @@ export class BoardComponent implements OnInit {
       this.gameService.getCards().subscribe((res)=>{
         console.log(res);
         this.myCards = res.hand;
+        this.turnIndex = res.index;
         this.gameOn = true;
       });
 
@@ -122,9 +127,11 @@ export class BoardComponent implements OnInit {
             console.log('Choose next card');
           } else {
             this.hideForms = true;
-            this.socket.emit('startPlaying', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
-              console.log('Lets go');
-            });
+            if(this.hideForms && this.hideTrump) {
+              this.socket.emit('startPlaying', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
+                console.log('Lets go');
+              });
+            }
           }
           this.socket.emit('myPartner', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), data: this.partnerForm.value}, (res)=> {
             console.log('success');
@@ -139,8 +146,36 @@ export class BoardComponent implements OnInit {
       this.socket.emit('trump', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), trump: this.trump.value}, (res)=>{
       console.log('trump chosen');
       this.hideTrump = true;
+      if(this.hideForms && this.hideTrump) {
+        this.socket.emit('startPlaying', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
+          console.log('Lets go');
+        });
+      }
     });
     }
+  }
+
+  makeMove() {
+    if(this.move.valid) {
+      this.socket.emit('move', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), move: this.move.value, turnIndex: this.turnIndex}, (res)=>{
+        this.myCards = this.myCards.filter(c => {
+          return !(c.suite === this.move.value.suite && c.value === this.move.value.value);
+        });
+      });
+    }
+  }
+
+  validateMove() {
+    if(this.move.value.suite === this.turnSuite) {
+      return true;
+    } else {
+      for(let i=0; i<this.myCards.length; i++) {
+        if(this.myCards[i].suite === this.turnSuite) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
 }

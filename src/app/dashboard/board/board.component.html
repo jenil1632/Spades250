@@ -7,11 +7,12 @@
 <select [formControl]="move" *ngIf="gameOn">
   <option *ngFor="let card of myCards">{{card.value}} of {{card.suite}}</option>
 </select>
+<button type="button" (click)="makeMove()">Select</button>
 
 <select [formControl]="trump" *ngIf="gameOn && !hideTrump">
   <option *ngFor="let suite of suiteArray">{{suite}}</option>
 </select>
-<button type="submit" (click)="submitTrump()">Select</button>
+<button type="submit" (click)="submitTrump()" *ngIf="gameOn && !hideTrump">Select</button>
 
 
 <form [formGroup]="partnerForm" *ngIf="gameOn && !hideForms">

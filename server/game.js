@@ -9,6 +9,8 @@ function Game() {
   this.teamA = new Set();
   this.teamB = new Set();
   this.trump = "";
+  this.currentTurn = 0;
+  this.moveCount = 0;
 }
 let {Player} = require('./models/player.js');
 let {Card} = require('./models/card.js');

@@ -92,8 +92,10 @@ io.on('connection', (socket)=>{
       io.sockets.in(room.name).emit('toast', {message: 'Game Started!'});
       const game = new Game();
       game.startgame(room.connections, playerArray);
+      let index = 0;
       game.allPlayers.forEach(player => {
-          io.to(player.id).emit('cards', {hand: player.hand});
+          io.to(player.id).emit('cards', {hand: player.hand, index: index});
+          index++;
         });
       let starter = Math.floor(Math.random()*room.connections);
       game.bid = 150;
@@ -146,7 +148,8 @@ io.on('connection', (socket)=>{
         game.teamB.add(p.id);
       }
     });
-    io.sockets.in(game.gameRoom).emit('toast', {message: 'Starting the Game!'});
+    io.sockets.in(game.gameRoom).emit('toast', {message: `Starting the Game! ${game.bidder.name}'s turn`});
+    io.to(game.bidder.id).emit('turn');
   });
 
   socket.on('trump', (data, callback)=>{
@@ -154,9 +157,29 @@ io.on('connection', (socket)=>{
       return g.gameRoom === data.roomName;
     });
     game.trump = data.trump;
-    socket.broadcast.to(g.gameRoom).emit('toast', {message: `${game.bidder.name} has chosen ${data.trump} as Trump`});
+    socket.broadcast.to(game.gameRoom).emit('toast', {message: `${game.bidder.name} has chosen ${data.trump} as Trump`});
     callback({message: 'Trump set successfully'});
   }
+
+  socket.on('move', (data, callback)=>{
+    let game  = ongoingGames.find((g)=> {
+      return g.gameRoom === data.roomName;
+    });
+    io.sockets.in(game.gameRoom).emit('update', {from: data.username, move: data.move});
+    game.moveCount++;
+    if(game.moveCount === game.allPlayers.length) {
+      // reset
+    } else {
+      if(data.index+1 >== game.allPlayers.length) {
+        game.currentTurn = 0;
+        io.to(game.allPlayers[game.currentTurn].id).emit('turn');
+      } else {
+        game.currentTurn++;
+        io.to(game.allPlayers[game.currentTurn]).emit('turn');
+      }
+      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.allPlayers[game.currentTurn].name}'s turn`});  
+    }
+  });
 
   socket.on('createMessage', (message, callback)=>{
     socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
