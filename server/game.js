@@ -11,9 +11,12 @@ function Game() {
   this.trump = "";
   this.currentTurn = 0;
   this.moveCount = 0;
+  this.mat = [];
 }
 let {Player} = require('./models/player.js');
 let {Card} = require('./models/card.js');
+const valueCards10 = [9, 10, 11, 12, 13, 22, 23, 24, 25, 26, 35, 36, 37, 38, 39, 48, 49, 50, 51, 52];
+const valueCards5 = [4, 17, 30, 43];
 
 Game.prototype.startgame = function(players, playerArray) {
     this.initalizeCardArray();
@@ -40,15 +43,40 @@ Game.prototype.removeCardsBeforeGame = function(players) {
 Game.prototype.initalizeCardArray = function() {
     for(let i=1; i<=52; i++){
       if(i>=1 && i<=13){
-        this.cardArray.push(new Card(i, i, "spade"));
+        if(valueCards10.includes(i)){
+          this.cardArray.push(new Card(i, i, "spade", 10));
+        } else if(valueCards5.includes(i)){
+          this.cardArray.push(new Card(i, i, "spade", 5));
+        } else {
+          this.cardArray.push(new Card(i, i, "spade", 0));
+        }
       } else if(i>=14 && i<=26) {
-        this.cardArray.push(new Card(i, i-13, "heart"));
+        if(valueCards10.includes(i)) {
+          this.cardArray.push(new Card(i, i-13, "heart", 10));
+        } else if(valueCards5.includes(i)) {
+          this.cardArray.push(new Card(i, i-13, "heart", 5));
+        } else {
+          this.cardArray.push(new Card(i, i-13, "heart", 0));
+        }
       } else if(i>=27 && i<=39) {
-        this.cardArray.push(new Card(i, i-26, "club"));
+        if(valueCards10.includes(i)) {
+          this.cardArray.push(new Card(i, i-26, "club", 10));
+        } else if(valueCards5.includes(i)) {
+          this.cardArray.push(new Card(i, i-26, "club", 5));
+        } else {
+          this.cardArray.push(new Card(i, i-26, "club", 0));
+        }
       } else {
-        this.cardArray.push(new Card(i, i-39, "diamond"));
+        if(valueCards10.includes(i)){
+          this.cardArray.push(new Card(i, i-39, "diamond", 10));
+        } else if(valueCards5.includes(i)) {
+          this.cardArray.push(new Card(i, i-39, "diamond", 5));
+        } else {
+          this.cardArray.push(new Card(i, i-39, "diamond", 0));
+        }
       }
     }
+    this.cardArray[2].points = 30;
 }
 
 Game.prototype.cardExistsInDeck = function (card){
@@ -87,5 +115,28 @@ Game.prototype.distributeCards = function(players){
       }
     }
 }
+
+Game.prototype.evaluateTurn = function() {
+  let biggestCard = this.mat[0];
+  let total = 0;
+  for(let i=1; i<this.mat.length; i++) {
+    total += this.mat[i].card.points;
+    if (biggestCard.card.suite === this.mat[i].card.suite) {
+      biggestCard = this.mat[i].card.value > biggestCard.card.value? this.mat[i] : biggestCard;
+    } else if(this.mat[i].card.suite === this.trump) {
+      biggestCard = this.mat[i];
+    }
+  }
+  let winner = this.allPlayers.find(p => p.id === biggestCard.id);
+  winner.score += total;
+  return winner;
+}
+
+Game.prototype.resetAfterTurn = function() {
+  this.moveCount = 0;
+  this.currentTurn = 0;
+  this.mat = [];
+}
+
 
 module.exports = {Game};

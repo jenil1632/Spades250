@@ -6,6 +6,7 @@ const publicPath = path.join(__dirname, '../public');
 const socketIO = require('socket.io');
 const http = require('http');
 const {Game} = require('./game.js');
+const {Card} = require('./card.js');
 //const {generateMessage} = require('./utils/message.js');
 
 
@@ -167,17 +168,21 @@ io.on('connection', (socket)=>{
     });
     io.sockets.in(game.gameRoom).emit('update', {from: data.username, move: data.move});
     game.moveCount++;
+    game.mat.push({id: socket.id, card: new Card(data.move.index, data.move.value, data.move.suite)});
     if(game.moveCount === game.allPlayers.length) {
-      // reset
+      let turnWinner = game.evaluateTurn();
+      game.resetAfterTurn();
+      io.sockets.in(game.gameRoom).emit('toast', {message: `${turnWinner.name} won this turn`});
+      io.to(turnWinner.id).emit('turn');
     } else {
       if(data.index+1 >== game.allPlayers.length) {
         game.currentTurn = 0;
         io.to(game.allPlayers[game.currentTurn].id).emit('turn');
       } else {
-        game.currentTurn++;
+        game.currentTurn = data.index + 1;
         io.to(game.allPlayers[game.currentTurn]).emit('turn');
       }
-      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.allPlayers[game.currentTurn].name}'s turn`});  
+      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.allPlayers[game.currentTurn].name}'s turn`});
     }
   });
 
