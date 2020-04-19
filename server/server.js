@@ -22,14 +22,22 @@ let ongoingGames = [];
 
 
 
-//get seller details
-app.get('/sellerprofile/:name', (req, res)=>{
-
-});
-
 app.post('/signup', (req, res)=>{
   let name = req.body.username;
   res.status(200).send({message: "success", username: name});
+});
+
+app.post('/getPartner', (req, res)=> {
+  let game = ongoingGames.find(g => g.gameRoom === req.body.roomName);
+  for(let i=0; i< game.allPlayers.length; i++) {
+    let p = game.allPlayers[i];
+    let card = p.hand.find(c => c.suite === req.body.suite && c.value === req.body.card);
+    if(card) {
+      game.teamA.add(p.id);
+      break;
+    }
+  }
+  res.status.send(200).send({message: "success"});
 });
 
 
@@ -122,10 +130,33 @@ io.on('connection', (socket)=>{
     });
     game.noChallenges++;
     if(game.noChallenges === game.allPlayers.length-1){
-      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder}'s bid of ${game.bid} has been accepted`});
+      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s bid of ${game.bid} has been accepted`});
+      io.to(game.bidder.id).emit('chooseCards', {no: game.allPlayers.length/2 -1});
+      game.teamA.add(game.bidder.id);
     }
     callback({message: "success"});
-  })
+  });
+
+  socket.on('startPlaying', (data, callback)=>{
+    let game  = ongoingGames.find((g)=> {
+      return g.gameRoom === data.roomName;
+    });
+    game.allPlayers.forEach((p) => {
+      if(!game.teamA.has(p.id)) {
+        game.teamB.add(p.id);
+      }
+    });
+    io.sockets.in(game.gameRoom).emit('toast', {message: 'Starting the Game!'});
+  });
+
+  socket.on('trump', (data, callback)=>{
+    let game  = ongoingGames.find((g)=> {
+      return g.gameRoom === data.roomName;
+    });
+    game.trump = data.trump;
+    socket.broadcast.to(g.gameRoom).emit('toast', {message: `${game.bidder.name} has chosen ${data.trump} as Trump`});
+    callback({message: 'Trump set successfully'});
+  }
 
   socket.on('createMessage', (message, callback)=>{
     socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));

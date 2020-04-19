@@ -19,4 +19,8 @@ export class GameService {
     return this.socket.fromEvent<any>('bid');
   }
 
+  public chooseCards(): Observable<any>{
+    return this.socket.fromEvent<any>('chooseCards');
+  }
+
 }

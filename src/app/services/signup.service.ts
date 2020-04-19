@@ -10,4 +10,8 @@ export class SignupService {
     return this.http.post('signup', {username: username});
   }
 
+  public submitCard(room, data): any{
+    return this.http.post('getPartner', {roomName: room, data: data});
+  }
+
 }
