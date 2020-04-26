@@ -47,6 +47,7 @@ export class BoardComponent implements OnInit {
   chosenCards;
   hideTrump = false;
   hideForms = false;
+  myTurn = false;
 
   ngOnInit() {
     this.route.queryParams
@@ -56,7 +57,7 @@ export class BoardComponent implements OnInit {
 
       this.myBid = new FormControl(null);
       this.trump = new FormControl(null, Validators.required);
-      this.move = new FormControl(null, [Validators.required, validateMove]);
+      this.move = new FormControl(null, [Validators.required, this.validateMove]);
       this.partnerForm = new FormGroup({
         suite: new FormControl(null, Validators.required),
         card: new FormControl(null, Validators.required)
@@ -87,8 +88,21 @@ export class BoardComponent implements OnInit {
       this.gameService.chooseCards().subscribe((res)=>{
         console.log('Choose Trump');
         this.partners = res.no;
+// something to do ??
+});
 
-      })
+     this.gameService.myTurn().subscribe(()=>{
+       this.myTurn = true;
+     });
+
+     this.gameService.updateMat().subscribe((res)=>{
+       this.mat.push(res);
+     });
+
+     this.gameService.resetMat().subscribe(()=>{
+       this.mat = [];
+     });
+
   }
 
   startGame() {
@@ -165,17 +179,19 @@ export class BoardComponent implements OnInit {
     }
   }
 
-  validateMove() {
-    if(this.move.value.suite === this.turnSuite) {
-      return true;
+  validateMove(control: FormControl) {
+    if(control.value.suite === this.turnSuite) {
+      return null;
     } else {
       for(let i=0; i<this.myCards.length; i++) {
         if(this.myCards[i].suite === this.turnSuite) {
-          return false;
+          return {
+            error: 'Not a valid move'
+          };
         }
       }
     }
-    return true;
+    return null;
   }
 
 }

@@ -12,6 +12,7 @@ function Game() {
   this.currentTurn = 0;
   this.moveCount = 0;
   this.mat = [];
+  this.completedTurns = 0;
 }
 let {Player} = require('./models/player.js');
 let {Card} = require('./models/card.js');
@@ -138,5 +139,26 @@ Game.prototype.resetAfterTurn = function() {
   this.mat = [];
 }
 
+Game.prototype.isGameCompleted = function() {
+  return this.completedTurns === (52 / this.allPlayers.length);
+}
+
+Game.prototype.evaluateGameWinner = function() {
+  let bidderScore = 0;
+  this.teamA.forEach(p => {
+    bidderScore += p.score;
+  });
+  if(bidderScore >= this.bid) {
+    return {
+      winner: this.teamA,
+      points: bidderScore
+    };
+  } else {
+    return {
+      winner: this.teamB,
+      points: 250 - bidderScore
+    };
+  }
+}
 
 module.exports = {Game};

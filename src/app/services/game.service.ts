@@ -23,4 +23,16 @@ export class GameService {
     return this.socket.fromEvent<any>('chooseCards');
   }
 
+  public myTurn(): Observable<any>{
+    return this.socket.fromEvent<any>('turn');
+  }
+
+  public updateMat(): Observable<any>{
+    return this.socket.fromEvent<any>('update');
+  }
+
+  public resetMat(): Observable<any>{
+    return this.socket.fromEvent<any>('resetMat');
+  }
+
 }

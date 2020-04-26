@@ -170,10 +170,22 @@ io.on('connection', (socket)=>{
     game.moveCount++;
     game.mat.push({id: socket.id, card: new Card(data.move.index, data.move.value, data.move.suite)});
     if(game.moveCount === game.allPlayers.length) {
+      game.completedTurns++;
       let turnWinner = game.evaluateTurn();
       game.resetAfterTurn();
       io.sockets.in(game.gameRoom).emit('toast', {message: `${turnWinner.name} won this turn`});
-      io.to(turnWinner.id).emit('turn');
+      if(game.isGameCompleted()) {
+        let winnerDetails = game.evaluateGameWinner();
+        let winnerList = '';
+        winnerDetails.winner.forEach(p => winnerList += `${p.name}, `);
+        io.sockets.in(game.gameRoom).emit('toast', {message: `Winning team is ${winnerList} with ${winnerDetails.points}`});
+        //reset game
+      } else {
+        setTimeout(()=>{
+          io.sockets.in(game.gameRoom).emit('resetMat');
+          io.to(turnWinner.id).emit('turn');
+        }, 5000);
+      }
     } else {
       if(data.index+1 >== game.allPlayers.length) {
         game.currentTurn = 0;
