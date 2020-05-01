@@ -12,6 +12,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "~7.2.0",
+    "@angular/cdk": "^7.2.2",
     "@angular/common": "~7.2.0",
     "@angular/compiler": "~7.2.0",
     "@angular/core": "~7.2.0",
@@ -26,7 +27,7 @@
     "moment": "^2.24.0",
     "ngx-socket-io": "^3.0.1",
     "primeicons": "^2.0.0",
-    "primeng": "^9.0.6",
+    "primeng": "^7.0.0",
     "rxjs": "~6.3.3",
     "socket.io": "^2.3.0",
     "tslib": "^1.9.0",

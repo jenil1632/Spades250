@@ -27,7 +27,7 @@ export class BoardComponent implements OnInit {
   move: FormControl;
   partnerForm: FormGroup;
   trump: FormControl;
-  suiteArray = ['spade', 'heart', 'club', 'diamond'];
+  suiteArray = [{value: 'spade', label: 'spade'}, {value: 'heart', label: 'heart'}, {value: 'club', label: 'club'}, {value: 'diamond', label: 'diamond'}];
   cardArray = [
     {value: 1, label:'Two'},
     {value: 2, label:'Three'},
@@ -44,10 +44,11 @@ export class BoardComponent implements OnInit {
     {value: 13, label: 'Ace'}
   ];
   partners;
-  chosenCards;
+  chosenCards = 0;
   hideTrump = false;
-  hideForms = false;
+  hideCardForms = false;
   myTurn = false;
+  hideAllForms = true;
 
   ngOnInit() {
     this.route.queryParams
@@ -88,10 +89,12 @@ export class BoardComponent implements OnInit {
       this.gameService.chooseCards().subscribe((res)=>{
         console.log('Choose Trump');
         this.partners = res.no;
+        this.hideAllForms = false;
 // something to do ??
 });
 
      this.gameService.myTurn().subscribe(()=>{
+       this.hideAllForms = true;
        this.myTurn = true;
      });
 
@@ -140,8 +143,8 @@ export class BoardComponent implements OnInit {
             this.partnerForm.reset();
             console.log('Choose next card');
           } else {
-            this.hideForms = true;
-            if(this.hideForms && this.hideTrump) {
+            this.hideCardForms = true;
+            if(this.hideCardForms && this.hideTrump) {
               this.socket.emit('startPlaying', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
                 console.log('Lets go');
               });
@@ -160,7 +163,7 @@ export class BoardComponent implements OnInit {
       this.socket.emit('trump', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), trump: this.trump.value}, (res)=>{
       console.log('trump chosen');
       this.hideTrump = true;
-      if(this.hideForms && this.hideTrump) {
+      if(this.hideCardForms && this.hideTrump) {
         this.socket.emit('startPlaying', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
           console.log('Lets go');
         });
@@ -180,14 +183,16 @@ export class BoardComponent implements OnInit {
   }
 
   validateMove(control: FormControl) {
-    if(control.value.suite === this.turnSuite) {
-      return null;
-    } else {
-      for(let i=0; i<this.myCards.length; i++) {
-        if(this.myCards[i].suite === this.turnSuite) {
-          return {
-            error: 'Not a valid move'
-          };
+    if (control.value) {
+      if(control.value.suite === this.turnSuite) {
+        return null;
+      } else {
+        for(let i=0; i<this.myCards.length; i++) {
+          if(this.myCards[i].suite === this.turnSuite) {
+            return {
+              error: 'Not a valid move'
+            };
+          }
         }
       }
     }

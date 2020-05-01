@@ -1,3 +1,11 @@
 ::ng-deep body .roomInput .ui-panel{
   margin-top: 8px;
 }
+
+.ui-inputtext {
+  border-color: #1ea04c;
+}
+
+.ui-button {
+  margin-left: 8px;
+}

@@ -1,26 +1,31 @@
-<button type="button" (click) = startGame() *ngIf="!gameOn">Start game</button>
+<!--<button type="button" (click) = startGame() *ngIf="!gameOn" pButton label="Start game"></button>-->
 
-<input [formControl]="myBid" *ngIf="gameOn && !stopBid">
-<button type="button" (click) = "submitBid()" *ngIf="gameOn && !stopBid">Bid</button>
-<button type="button" (click) = "noChallenge()" *ngIf="gameOn && !stopBid">Pass</button>
+<div *ngIf="gameOn && !stopBid">
+<input [formControl]="myBid" pInputText placeholder="Enter your Bid">
+<button type="button" (click) = "submitBid()" pButton label="Bid"></button>
+<button type="button" (click) = "noChallenge()" pButton label="Pass" class="ui-button-danger"></button>
+</div>
 
 <select [formControl]="move" *ngIf="gameOn">
   <option *ngFor="let card of myCards">{{card.value}} of {{card.suite}}</option>
 </select>
-<button type="button" (click)="makeMove()">Select</button>
+<button type="button" (click)="makeMove()" *ngIf="gameOn">Select</button>
 
-<select [formControl]="trump" *ngIf="gameOn && !hideTrump">
-  <option *ngFor="let suite of suiteArray">{{suite}}</option>
-</select>
-<button type="submit" (click)="submitTrump()" *ngIf="gameOn && !hideTrump">Select</button>
-
-
-<form [formGroup]="partnerForm" *ngIf="gameOn && !hideForms">
-  <select formControlName="suite">
-    <option *ngFor="let suite of suiteArray">{{suite}}</option>
-  </select>
-  <select formControlName="card">
-  <option *ngFor="let cd of cardArray">{{cd.label}}</option>
-</select>
-<button type="submit" (click)="submitCard()">Select</button>
-</form>
+<div *ngIf="hideAllForms">
+  <form [formGroup]="partnerForm" *ngIf="gameOn && !hideCardForms" class = "formClass">
+    <h4 class = "heading">Choose Partner card ({{chosenCards + 1}})</h4>
+    <div>
+    <p-dropdown [options] = "suiteArray" placeholder = "Select suite" formControlName="suite">
+    </p-dropdown>
+    <p-dropdown [options] = "cardArray" placeholder = "Select Card" formControlName="card">
+    </p-dropdown>
+  </div>
+  <button type="submit" (click)="submitCard()" pButton label="Select" class="bigButton"></button>
+  </form>
+  <div *ngIf="gameOn && !hideTrump" class = "formClass">
+    <h4 class = "heading">Choose Trump</h4>
+    <p-dropdown [options] = "suiteArray" placeholder = "Select trump" [formControl]="trump">
+    </p-dropdown>
+    <button type="submit" (click)="submitTrump()" pButton label="Select" class="bigButton"></button>
+  </div>
+</div>

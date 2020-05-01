@@ -1,0 +1,28 @@
+.ui-inputtext {
+  border-color: #1ea04c;
+}
+
+.ui-button {
+  margin-left: 8px;
+}
+
+::ng-deep body .ui-dropdown {
+  border-color: #1ea04c;
+}
+
+.formClass {
+  border: 1px solid #1ea04c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px;
+}
+
+.heading {
+  text-align: center;
+}
+
+.bigButton {
+  margin: 8px 0 0 0;
+  align-self: stretch;
+}
