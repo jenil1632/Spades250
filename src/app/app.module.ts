@@ -14,6 +14,9 @@ import { GameService } from './services/game.service';
 import { RoomComponent } from './dashboard/room/room.component';
 import { BoardComponent } from './dashboard/board/board.component';
 
+import {ButtonModule} from 'primeng/button';
+import {InputTextModule} from 'primeng/inputtext';
+
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
 @NgModule({
@@ -29,7 +32,9 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    SocketIoModule.forRoot(config)
+    SocketIoModule.forRoot(config),
+    ButtonModule,
+    InputTextModule
   ],
   providers: [SignupService, GameService],
   bootstrap: [AppComponent]

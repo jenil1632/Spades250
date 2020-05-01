@@ -6,7 +6,7 @@ const publicPath = path.join(__dirname, '../public');
 const socketIO = require('socket.io');
 const http = require('http');
 const {Game} = require('./game.js');
-const {Card} = require('./card.js');
+const {Card} = require('./models/card.js');
 //const {generateMessage} = require('./utils/message.js');
 
 
@@ -160,7 +160,7 @@ io.on('connection', (socket)=>{
     game.trump = data.trump;
     socket.broadcast.to(game.gameRoom).emit('toast', {message: `${game.bidder.name} has chosen ${data.trump} as Trump`});
     callback({message: 'Trump set successfully'});
-  }
+  });
 
   socket.on('move', (data, callback)=>{
     let game  = ongoingGames.find((g)=> {
@@ -187,7 +187,7 @@ io.on('connection', (socket)=>{
         }, 5000);
       }
     } else {
-      if(data.index+1 >== game.allPlayers.length) {
+      if(data.index+1 >= game.allPlayers.length) {
         game.currentTurn = 0;
         io.to(game.allPlayers[game.currentTurn].id).emit('turn');
       } else {

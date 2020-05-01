@@ -1,0 +1,15 @@
+.component-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 57px);
+}
+
+.ui-inputtext {
+  border-color: #1ea04c;
+}
+
+.ui-button {
+  margin-left: 8px;
+}
