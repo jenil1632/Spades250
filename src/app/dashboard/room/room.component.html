@@ -1,6 +1,9 @@
-<button (click)="showCreateRoomInput()">Create Room</button>
-<input type="text" placeholder="Type here" [formControl]="newRoomName" *ngIf="createRoom"/>
-<button type="submit" (click)="create()">Create</button>
-<button (click)="showJoinRoomInput()">Join Room</button>
-<input type="text" placeholder="Type here" [formControl]="existingRoomName" *ngIf="joinRoom"/>
-<button type="submit" (click)="join()">Join</button>
+<p-panel header="Create Room" [toggleable]="true" collapsed = "true" class = "roomInput">
+  <input type="text" placeholder="Type here" [formControl]="newRoomName" pInputText/>
+  <button type="submit" (click)="create()" pButton label="Create"></button>
+</p-panel>
+
+<p-panel header="Join Room" [toggleable]="true" collapsed = "true" class = "roomInput">
+  <input type="text" placeholder="Type here" [formControl]="existingRoomName" pInputText/>
+  <button type="submit" (click)="join()" pButton label="Join"></button>
+</p-panel>

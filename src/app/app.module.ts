@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +17,7 @@ import { BoardComponent } from './dashboard/board/board.component';
 
 import {ButtonModule} from 'primeng/button';
 import {InputTextModule} from 'primeng/inputtext';
+import {PanelModule} from 'primeng/panel';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
@@ -32,9 +34,11 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
+    BrowserAnimationsModule,
     SocketIoModule.forRoot(config),
     ButtonModule,
-    InputTextModule
+    InputTextModule,
+    PanelModule
   ],
   providers: [SignupService, GameService],
   bootstrap: [AppComponent]

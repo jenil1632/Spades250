@@ -13,8 +13,6 @@ export class RoomComponent implements OnInit {
 
   constructor(private router: Router, private socket: Socket) { }
 
-  createRoom = false;
-  joinRoom = false;
   newRoomName: FormControl;
   existingRoomName: FormControl;
 
@@ -22,14 +20,6 @@ export class RoomComponent implements OnInit {
     this.newRoomName = new FormControl(null, Validators.required);
     this.existingRoomName = new FormControl(null, Validators.required);
   }
-
-showCreateRoomInput(){
-  this.createRoom = true;
-}
-
-showJoinRoomInput(){
-  this.joinRoom = true;
-}
 
 create(){
   if(this.newRoomName.valid){
