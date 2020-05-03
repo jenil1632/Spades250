@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GameService } from './../../services/game.service';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { SignupService } from './../../services/signup.service';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-board',
@@ -15,7 +16,7 @@ import { SignupService } from './../../services/signup.service';
 })
 export class BoardComponent implements OnInit {
 
-  constructor(private socket: Socket, private route: ActivatedRoute, private gameService: GameService, private signupService: SignupService) { }
+  constructor(private socket: Socket, private route: ActivatedRoute, private gameService: GameService, private signupService: SignupService, private messageService: MessageService) { }
 
   @ViewChild('conversation') private conversation: ElementRef;
   @ViewChild('messageList') private messages: ElementRef;
@@ -145,7 +146,7 @@ export class BoardComponent implements OnInit {
       });
 
       this.gameService.getToast().subscribe((res)=>{
-        console.log(res);
+        this.messageService.add({severity: 'info', summary: res.message, life: 4000});
       });
 
       this.gameService.getMesssage().subscribe((res)=>{
@@ -155,16 +156,16 @@ export class BoardComponent implements OnInit {
       this.gameService.promptBid().subscribe((res)=>{
         if(res.name !== sessionStorage.getItem('spadesUsername')){
           if(this.challenge === true) {
-            console.log(`${res.name} has bid ${res.value}. Challenge ?`);
+            this.messageService.add({severity: 'info', summary: `${res.name} has bid ${res.value}. Challenge ?`, life: 4000});
           } else {
-            console.log(`${res.name} has bid ${res.value}.`);
+            this.messageService.add({severity: 'info', summary: `${res.name} has bid ${res.value}.`, life: 3000});
           }
         }
         this.minimumBid = res.value;
       });
 
       this.gameService.chooseCards().subscribe((res)=>{
-        console.log('Choose Trump');
+        this.messageService.add({severity: 'info', summary: 'Choose trump and partner cards', life: 3000});
         this.partners = res.no;
         this.hideAllForms = false;
 // something to do ??
@@ -197,7 +198,7 @@ export class BoardComponent implements OnInit {
           this.minimumBid = this.myBid.value;
           this.myBid.reset();
         } else {
-          alert('Bid failed');
+          this.messageService.add({severity: 'error', summary: 'Bid failed', life: 4000});
         }
       });
     }
@@ -218,17 +219,17 @@ export class BoardComponent implements OnInit {
           this.chosenCards++;
           if(this.chosenCards !== this.partners) {
             this.partnerForm.reset();
-            console.log('Choose next card');
+            this.messageService.add({severity: 'info', summary: 'Choose next card', life: 3000});
           } else {
             this.hideCardForms = true;
             if(this.hideCardForms && this.hideTrump) {
               this.socket.emit('startPlaying', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
-                console.log('Lets go');
+                this.messageService.add({severity: 'success', summary: 'Lets go', life: 2000});
               });
             }
           }
           this.socket.emit('myPartner', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), data: this.partnerForm.value}, (res)=> {
-            console.log('success');
+            this.messageService.add({severity: 'success', summary: 'Partners set', life: 2000});
           });
         }
       });
@@ -238,11 +239,11 @@ export class BoardComponent implements OnInit {
   submitTrump() {
     if(this.trump.valid){
       this.socket.emit('trump', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), trump: this.trump.value}, (res)=>{
-      console.log('trump chosen');
+      this.messageService.add({severity: 'success', summary: 'Trump chosen', life: 2000});
       this.hideTrump = true;
       if(this.hideCardForms && this.hideTrump) {
         this.socket.emit('startPlaying', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
-          console.log('Lets go');
+          this.messageService.add({severity: 'success', summary: 'Lets go', life: 2000});
         });
       }
     });
@@ -321,7 +322,7 @@ export class BoardComponent implements OnInit {
   scrollToBottom() {
     if(this.listOfMessages.length > 0) {
       this.conversation.nativeElement.scrollTop = this.messages.nativeElement.scrollHeight;
-    }    
+    }
   }
 
   ngAfterViewChecked() {
