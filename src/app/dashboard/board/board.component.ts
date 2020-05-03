@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { ActivatedRoute } from '@angular/router';
 import { GameService } from './../../services/game.service';
@@ -17,6 +17,8 @@ export class BoardComponent implements OnInit {
 
   constructor(private socket: Socket, private route: ActivatedRoute, private gameService: GameService, private signupService: SignupService) { }
 
+  @ViewChild('conversation') private conversation: ElementRef;
+  @ViewChild('messageList') private messages: ElementRef;
   room;
   myCards;
   minimumBid;
@@ -91,6 +93,8 @@ export class BoardComponent implements OnInit {
     {value: 13, label: 'Ace'}
   ];
   partners;
+  message: FormControl;
+  listOfMessages = [];
   chosenCards = 0;
   hideTrump = false;
   hideCardForms = false;
@@ -131,6 +135,7 @@ export class BoardComponent implements OnInit {
         suite: new FormControl(null, Validators.required),
         card: new FormControl(null, Validators.required)
       });
+      this.message = new FormControl(null, [Validators.required, ]);
 
       this.gameService.getCards().subscribe((res)=>{
         console.log(res);
@@ -141,6 +146,10 @@ export class BoardComponent implements OnInit {
 
       this.gameService.getToast().subscribe((res)=>{
         console.log(res);
+      });
+
+      this.gameService.getMesssage().subscribe((res)=>{
+        this.listOfMessages.push(res);
       });
 
       this.gameService.promptBid().subscribe((res)=>{
@@ -278,6 +287,45 @@ export class BoardComponent implements OnInit {
       this.numScroll = 3;
       this.numVisible = 3;
     }
+  }
+
+  validateTextMessage(control: FormControl) {
+    if(control.value && control.value.trim() != '') {
+      return null;
+    } else {
+      return {
+        error: 'Invalid message'
+      }
+    }
+  }
+
+  postMessage() {
+    if(this.message.valid) {
+      this.listOfMessages.push({
+            username: sessionStorage.getItem('spadesUsername'),
+            message: this.message.value
+          });
+          this.message.reset();
+      // this.socket.emit('createMessage', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), message: this.message.value}, (res)=>{
+      //   if(res.message === 'success') {
+      //     this.listOfMessages.push({
+      //       username: sessionStorage.getItem('spadesUsername'),
+      //       message: this.message.value
+      //     });
+      //      this.message.reset();
+      //   }
+      // });
+    }
+  }
+
+  scrollToBottom() {
+    if(this.listOfMessages.length > 0) {
+      this.conversation.nativeElement.scrollTop = this.messages.nativeElement.scrollHeight;
+    }    
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
   }
 
 }

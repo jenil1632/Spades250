@@ -198,9 +198,9 @@ io.on('connection', (socket)=>{
     }
   });
 
-  socket.on('createMessage', (message, callback)=>{
-    socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
-    callback('This is from the server');
+  socket.on('createMessage', (data, callback)=>{
+    socket.broadcast.to(data.roomName).emit('newMessage', data);
+    callback({message: 'success'});
   });
 });
 

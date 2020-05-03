@@ -48,7 +48,7 @@
   margin: 0 auto;
   flex-wrap: wrap;
   justify-content: space-around;
-  max-height: 350px;
+  height: 350px;
   overflow: scroll;
 }
 
@@ -67,4 +67,36 @@
 ::ng-deep .matCard .ui-card-footer {
   padding-top: 4px;
   text-align: center;
+}
+
+.message-box {
+  width: 40%;
+  padding-right: 4px;
+  margin-top: 4px;
+}
+
+.userActionBar {
+  display: flex;
+}
+
+.conversation {
+  height: 200px;
+  border: 1px solid #b3c2ca;
+  overflow: scroll;
+}
+
+.input-bar {
+  display: flex;
+}
+
+.input-box {
+  height: 40px;
+  resize: none;
+  border: none;
+}
+
+#message-list {
+  padding-left: 4px;
+  margin: 4px 0 4px 0;
+  list-style: none;
 }

@@ -20,6 +20,7 @@
   </p-card>
 </div>
 
+<div class = "userActionBar">
 <div style="width: 60%">
 <p-carousel [value]="cardArray" [numVisible]="numVisible" [numScroll]="numScroll" [circular]="false" [responsiveOptions]="responsiveOptions" dotsContainerClass = "noDisplay">
     <ng-template let-card pTemplate="item">
@@ -34,8 +35,22 @@
     </ng-template>
 </p-carousel>
 </div>
-
-
+<div class = "message-box">
+  <div class = "conversation" #conversation>
+  <ul #messageList id = "message-list">
+    <li *ngFor = "let message of listOfMessages">
+      <div>
+        <span><b>{{message.username}}</b> : {{message.message}}</span>
+      </div>
+    </li>
+  </ul>
+  </div>
+  <div class = "input-bar">
+  <textarea class = "input-box" placeholder="Type your message here" style="padding: 4px" [formControl] = "message"></textarea>
+  <button type="button" pButton (click) = "postMessage()" label = ">"></button>
+</div>
+</div>
+</div>
 
 
 <div *ngIf="hideAllForms">

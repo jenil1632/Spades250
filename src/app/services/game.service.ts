@@ -35,4 +35,8 @@ export class GameService {
     return this.socket.fromEvent<any>('resetMat');
   }
 
+  public getMesssage(): Observable<any>{
+    return this.socket.fromEvent<any>('newMessage');
+  }
+
 }
