@@ -2,14 +2,41 @@
 
 <div *ngIf="gameOn && !stopBid">
 <input [formControl]="myBid" pInputText placeholder="Enter your Bid">
-<button type="button" (click) = "submitBid()" pButton label="Bid"></button>
-<button type="button" (click) = "noChallenge()" pButton label="Pass" class="ui-button-danger"></button>
+<button type="button" (click) = "submitBid()" pButton label="Bid" class="formButton"></button>
+<button type="button" (click) = "noChallenge()" pButton label="Pass" class="ui-button-danger formButton"></button>
 </div>
 
 <select [formControl]="move" *ngIf="gameOn">
   <option *ngFor="let card of myCards">{{card.value}} of {{card.suite}}</option>
 </select>
 <button type="button" (click)="makeMove()" *ngIf="gameOn">Select</button>
+
+<div class = "mat">
+  <p-card *ngFor = "let mv of mat" styleClass = "matCard">
+    <img src="assets/img/card_images/{{mv.move.index}}.png" class = "matCardImage"/>
+    <p-footer>
+      {{mv.from}}
+    </p-footer>
+  </p-card>
+</div>
+
+<div style="width: 60%">
+<p-carousel [value]="cardArray" [numVisible]="numVisible" [numScroll]="numScroll" [circular]="false" [responsiveOptions]="responsiveOptions" dotsContainerClass = "noDisplay">
+    <ng-template let-card pTemplate="item">
+        <div class="card-details">
+                <div>
+                    <img src="assets/img/card_images/1.png" class = "cardImage"/>
+                </div>
+                    <div>
+                        <button pButton type="button" label="Select"></button>
+                    </div>
+        </div>
+    </ng-template>
+</p-carousel>
+</div>
+
+
+
 
 <div *ngIf="hideAllForms">
   <form [formGroup]="partnerForm" *ngIf="gameOn && !hideCardForms" class = "formClass">

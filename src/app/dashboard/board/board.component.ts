@@ -8,7 +8,10 @@ import { SignupService } from './../../services/signup.service';
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
-  styleUrls: ['./board.component.css']
+  styleUrls: ['./board.component.css'],
+  host: {
+    class: 'boardWidth'
+  }
 })
 export class BoardComponent implements OnInit {
 
@@ -19,7 +22,51 @@ export class BoardComponent implements OnInit {
   minimumBid;
   turnIndex;
   turnSuite = null;
-  mat = [];
+  //mat = [];
+  mat  = [
+  {
+    from: 'jenil',
+    move: {
+      index: 2
+    }
+  },
+  {
+    from: 'qwerty',
+    move: {
+      index: 22
+    }
+  },
+  {
+    from: 'pranji',
+    move: {
+      index: 18
+    }
+  },
+  {
+    from: 'mango',
+    move: {
+      index: 47
+    }
+  },
+  {
+    from: 'batman',
+    move: {
+      index: 16
+    }
+  },
+  {
+    from: 'dolly',
+    move: {
+      index: 36
+    }
+  },
+  {
+    from: 'ashu',
+    move: {
+      index: 30
+    }
+  }
+];
   myBid: FormControl;
   gameOn = false;
   challenge = true;
@@ -49,12 +96,33 @@ export class BoardComponent implements OnInit {
   hideCardForms = false;
   myTurn = false;
   hideAllForms = true;
+  numVisible = 4;
+  numScroll = 3;
+  responsiveOptions = [
+            {
+                breakpoint: '1024px',
+                numVisible: 3,
+                numScroll: 3
+            },
+            {
+                breakpoint: '768px',
+                numVisible: 2,
+                numScroll: 2
+            },
+            {
+                breakpoint: '560px',
+                numVisible: 1,
+                numScroll: 1
+            }
+        ];
 
   ngOnInit() {
     this.route.queryParams
       .subscribe(params => {
         this.room = params.room;
       });
+
+      this.setCarouselParams();
 
       this.myBid = new FormControl(null);
       this.trump = new FormControl(null, Validators.required);
@@ -197,6 +265,19 @@ export class BoardComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  setCarouselParams() {
+    if(window.innerWidth < 560) {
+      this.numScroll = 1;
+      this.numVisible = 1;
+    } else if(window.innerWidth < 768) {
+      this.numScroll = 2;
+      this.numVisible = 2;
+    } else {
+      this.numScroll = 3;
+      this.numVisible = 3;
+    }
   }
 
 }

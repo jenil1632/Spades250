@@ -19,6 +19,8 @@ import {ButtonModule} from 'primeng/button';
 import {InputTextModule} from 'primeng/inputtext';
 import {PanelModule} from 'primeng/panel';
 import {DropdownModule} from 'primeng/dropdown';
+import {CarouselModule} from 'primeng/carousel';
+import {CardModule} from 'primeng/card';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
@@ -40,7 +42,9 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     ButtonModule,
     InputTextModule,
     PanelModule,
-    DropdownModule
+    DropdownModule,
+    CarouselModule,
+    CardModule
   ],
   providers: [SignupService, GameService],
   bootstrap: [AppComponent]

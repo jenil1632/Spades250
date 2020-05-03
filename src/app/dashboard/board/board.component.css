@@ -2,7 +2,7 @@
   border-color: #1ea04c;
 }
 
-.ui-button {
+.formButton {
   margin-left: 8px;
 }
 
@@ -25,4 +25,46 @@
 .bigButton {
   margin: 8px 0 0 0;
   align-self: stretch;
+}
+
+.cardImage {
+  max-height: 150px;
+}
+
+.card-details {
+  border: 1px solid #b3c2ca;
+             border-radius: 3px;
+             margin: 0.3em;
+             text-align: center;
+             padding: 2em 0 2.25em 0;
+             background: #323232;
+}
+
+.mat {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #b3c2ca;
+  width: 90%;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  max-height: 350px;
+  overflow: scroll;
+}
+
+.matCardImage {
+  max-height: 120px;
+}
+
+::ng-deep .matCard.ui-card{
+  margin: 4px;
+}
+
+::ng-deep .matCard .ui-card-body {
+  padding: 8px;
+}
+
+::ng-deep .matCard .ui-card-footer {
+  padding-top: 4px;
+  text-align: center;
 }

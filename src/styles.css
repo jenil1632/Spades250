@@ -2,3 +2,11 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background: #585858; color: white}
+
+.boardWidth {
+  max-width: 100%;
+}
+
+.noDisplay {
+  display: none;
+}
