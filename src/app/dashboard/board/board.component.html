@@ -1,5 +1,5 @@
 <p-toast position="top-center"></p-toast>
-<!--<button type="button" (click) = startGame() *ngIf="!gameOn" pButton label="Start game"></button>-->
+<button type="button" (click) = startGame() *ngIf="!gameOn" pButton label="Start game"></button>
 
 <div *ngIf="gameOn && !stopBid">
 <input [formControl]="myBid" pInputText placeholder="Enter your Bid">
@@ -12,7 +12,8 @@
 </select>
 <button type="button" (click)="makeMove()" *ngIf="gameOn">Select</button>
 
-<div class = "mat">
+<h3 class="bigScreen" *ngIf="gameOn && stopBid">Board</h3>
+<div class = "mat" *ngIf="gameOn && !stopBid">
   <p-card *ngFor = "let mv of mat" styleClass = "matCard">
     <img src="assets/img/card_images/{{mv.move.index}}.png" class = "matCardImage"/>
     <p-footer>
@@ -21,13 +22,14 @@
   </p-card>
 </div>
 
-<div class = "userActionBar">
-<div style="width: 60%">
-<p-carousel [value]="cardArray" [numVisible]="numVisible" [numScroll]="numScroll" [circular]="false" [responsiveOptions]="responsiveOptions" dotsContainerClass = "noDisplay">
+<div class = "userActionBar" *ngIf="gameOn">
+<div class = "handContainer">
+  <h4 class="bigScreen">Hand</h4>
+<p-carousel [value]="myCards" [numVisible]="numVisible" [numScroll]="numScroll" [circular]="false" [responsiveOptions]="responsiveOptions" dotsContainerClass = "noDisplay">
     <ng-template let-card pTemplate="item">
         <div class="card-details">
                 <div>
-                    <img src="assets/img/card_images/1.png" class = "cardImage"/>
+                    <img src="assets/img/card_images/{{card.index}}.png" class = "cardImage"/>
                 </div>
                     <div>
                         <button pButton type="button" label="Select"></button>
@@ -37,6 +39,7 @@
 </p-carousel>
 </div>
 <div class = "message-box">
+  <h4 class="bigScreen">Chat</h4>
   <div class = "conversation" #conversation>
   <ul #messageList id = "message-list">
     <li *ngFor = "let message of listOfMessages">
@@ -47,12 +50,11 @@
   </ul>
   </div>
   <div class = "input-bar">
-  <textarea class = "input-box" placeholder="Type your message here" style="padding: 4px" [formControl] = "message"></textarea>
+  <textarea class = "input-box" placeholder="Type your message here" style="padding: 4px; flex-grow: 1" [formControl] = "message"></textarea>
   <button type="button" pButton (click) = "postMessage()" label = ">"></button>
 </div>
 </div>
 </div>
-
 
 <div *ngIf="hideAllForms">
   <form [formGroup]="partnerForm" *ngIf="gameOn && !hideCardForms" class = "formClass">

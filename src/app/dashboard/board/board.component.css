@@ -48,8 +48,8 @@
   margin: 0 auto;
   flex-wrap: wrap;
   justify-content: space-around;
-  height: 350px;
-  overflow: scroll;
+  max-height: 55vh;
+  overflow: auto;
 }
 
 .matCardImage {
@@ -77,12 +77,13 @@
 
 .userActionBar {
   display: flex;
+    justify-content: center;
 }
 
 .conversation {
   height: 200px;
   border: 1px solid #b3c2ca;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .input-bar {
@@ -99,4 +100,26 @@
   padding-left: 4px;
   margin: 4px 0 4px 0;
   list-style: none;
+}
+
+.bigScreen {
+  display: none;
+  text-align: center;
+}
+
+.handContainer {
+   width: 60%;
+}
+
+@media (min-width: 768px) {
+  .mat {
+    max-width: 80%;
+    margin-bottom: 16px;
+  }
+  .bigScreen {
+    display: block;
+  }
+  .message-box {
+    max-width: 300px;
+  }
 }

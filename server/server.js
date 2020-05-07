@@ -41,6 +41,10 @@ app.post('/getPartner', (req, res)=> {
   res.status.send(200).send({message: "success"});
 });
 
+app.get('*', (req,res) => {
+    res.sendFile(path.join(__dirname, '..', 'dist/Spades250/index.html'));
+});
+
 
 //messaging app event listener
 io.on('connection', (socket)=>{
