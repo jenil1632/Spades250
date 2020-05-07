@@ -22,58 +22,15 @@ export class BoardComponent implements OnInit {
   @ViewChild('messageList') private messages: ElementRef;
   room;
   myCards;
-  minimumBid;
+  minimumBid = 150;
   turnIndex;
   turnSuite = null;
-  //mat = [];
-  mat  = [
-  {
-    from: 'jenil',
-    move: {
-      index: 2
-    }
-  },
-  {
-    from: 'qwerty',
-    move: {
-      index: 22
-    }
-  },
-  {
-    from: 'pranji',
-    move: {
-      index: 18
-    }
-  },
-  {
-    from: 'mango',
-    move: {
-      index: 47
-    }
-  },
-  {
-    from: 'batman',
-    move: {
-      index: 16
-    }
-  },
-  {
-    from: 'dolly',
-    move: {
-      index: 36
-    }
-  },
-  {
-    from: 'ashu',
-    move: {
-      index: 30
-    }
-  }
-];
+  mat = [];
   myBid: FormControl;
   gameOn = false;
   challenge = true;
-  stopBid = false;
+  startingTurns = false;
+  disableBid = false;
   move: FormControl;
   partnerForm: FormGroup;
   trump: FormControl;
@@ -157,6 +114,7 @@ export class BoardComponent implements OnInit {
         if(res.name !== sessionStorage.getItem('spadesUsername')){
           if(this.challenge === true) {
             this.messageService.add({severity: 'info', summary: `${res.name} has bid ${res.value}. Challenge ?`, life: 4000});
+            this.disableBid = false;
           } else {
             this.messageService.add({severity: 'info', summary: `${res.name} has bid ${res.value}.`, life: 3000});
           }
@@ -184,6 +142,10 @@ export class BoardComponent implements OnInit {
        this.mat = [];
      });
 
+     this.gameService.startingTurns().subscribe(()=>{
+       this.startingTurns = true;
+     });
+
   }
 
   startGame() {
@@ -196,6 +158,8 @@ export class BoardComponent implements OnInit {
       this.socket.emit('newBid', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), bid: this.myBid.value}, (res)=> {
         if(res.message === 'success'){
           this.minimumBid = this.myBid.value;
+          this.messageService.add({severity: 'success', summary: 'Bid successfull', life: 3000});
+          this.disableBid = true;
           this.myBid.reset();
         } else {
           this.messageService.add({severity: 'error', summary: 'Bid failed', life: 4000});
@@ -207,14 +171,16 @@ export class BoardComponent implements OnInit {
   noChallenge() {
     this.socket.emit('noChallenge', {roomName: this.room, username: sessionStorage.getItem('spadesUsername')}, (res)=>{
       if(res.message === 'success') {
-        this.stopBid = true;
+        this.disableBid = true;
+        this.challenge = false;
+        this.messageService.add({severity: 'success', summary: 'Passed! Waiting for bidding to finish', life: 2000})
       }
     });
   }
 
   submitCard() {
     if(this.partnerForm.valid){
-      this.signupService.submitCard(this.room, this.partnerForm.value).subscribe((res)=>{
+      this.socket.emit('partnerCard', {roomName: this.room, data: this.partnerForm.value}, (res)=> {
         if(res.message === 'success'){
           this.chosenCards++;
           if(this.chosenCards !== this.partners) {
@@ -302,20 +268,15 @@ export class BoardComponent implements OnInit {
 
   postMessage() {
     if(this.message.valid) {
-      this.listOfMessages.push({
+      this.socket.emit('createMessage', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), message: this.message.value}, (res)=>{
+        if(res.message === 'success') {
+          this.listOfMessages.push({
             username: sessionStorage.getItem('spadesUsername'),
             message: this.message.value
           });
-          this.message.reset();
-      // this.socket.emit('createMessage', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), message: this.message.value}, (res)=>{
-      //   if(res.message === 'success') {
-      //     this.listOfMessages.push({
-      //       username: sessionStorage.getItem('spadesUsername'),
-      //       message: this.message.value
-      //     });
-      //      this.message.reset();
-      //   }
-      // });
+           this.message.reset();
+        }
+      });
     }
   }
 

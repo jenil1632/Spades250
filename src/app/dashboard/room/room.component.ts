@@ -27,7 +27,7 @@ create(){
       if(res.message === 'success'){
         this.messageService.add({severity: 'success', summary: 'Room created successfully', life: 3000});
         setTimeout(()=> {
-          this.router.navigate(['/board'], {queryParams: {room: this.newRoomName.value}});
+          this.router.navigate(['/board'], {queryParams: {room: this.newRoomName.value, username: sessionStorage.getItem('spadesUsername')}});
         }, 3000);
       }
     });
@@ -40,7 +40,7 @@ create(){
         if(res.message === 'success'){
           this.messageService.add({severity: 'success', summary: `Joined Room ${this.existingRoomName.value}`, life: 3000});
           setTimeout(()=> {
-            this.router.navigate(['/board'], {queryParams: {room: this.existingRoomName.value}});
+            this.router.navigate(['/board'], {queryParams: {room: this.existingRoomName.value, username: sessionStorage.getItem('spadesUsername')}});
           }, 3000);
         }
         else {

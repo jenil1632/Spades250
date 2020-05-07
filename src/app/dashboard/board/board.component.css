@@ -50,6 +50,7 @@
   justify-content: space-around;
   max-height: 55vh;
   overflow: auto;
+  min-height: 300px;
 }
 
 .matCardImage {
@@ -111,6 +112,12 @@
    width: 60%;
 }
 
+.bidding {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
 @media (min-width: 768px) {
   .mat {
     max-width: 80%;
@@ -121,5 +128,15 @@
   }
   .message-box {
     max-width: 300px;
+  }
+  .allForms {
+    display: flex;
+    justify-content: center;
+  }
+  #trumpForm {
+    min-width: 350px;
+  }
+  .mat {
+    min-height: 200px;
   }
 }

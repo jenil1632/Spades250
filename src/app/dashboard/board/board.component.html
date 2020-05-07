@@ -1,19 +1,14 @@
 <p-toast position="top-center"></p-toast>
 <button type="button" (click) = startGame() *ngIf="!gameOn" pButton label="Start game"></button>
 
-<div *ngIf="gameOn && !stopBid">
+<div *ngIf="gameOn && !disableBid" class = "bidding">
 <input [formControl]="myBid" pInputText placeholder="Enter your Bid">
-<button type="button" (click) = "submitBid()" pButton label="Bid" class="formButton"></button>
-<button type="button" (click) = "noChallenge()" pButton label="Pass" class="ui-button-danger formButton"></button>
+<button type="button" (click) = "submitBid()" pButton label="Bid" class="formButton" [disabled] = "disableBid"></button>
+<button type="button" (click) = "noChallenge()" pButton label="Pass" class="ui-button-danger formButton" [disabled] = "disableBid"></button>
 </div>
 
-<select [formControl]="move" *ngIf="gameOn">
-  <option *ngFor="let card of myCards">{{card.value}} of {{card.suite}}</option>
-</select>
-<button type="button" (click)="makeMove()" *ngIf="gameOn">Select</button>
-
-<h3 class="bigScreen" *ngIf="gameOn && stopBid">Board</h3>
-<div class = "mat" *ngIf="gameOn && !stopBid">
+<h3 class="bigScreen" *ngIf="startingTurns">Board</h3>
+<div class = "mat" *ngIf="startingTurns">
   <p-card *ngFor = "let mv of mat" styleClass = "matCard">
     <img src="assets/img/card_images/{{mv.move.index}}.png" class = "matCardImage"/>
     <p-footer>
@@ -32,7 +27,7 @@
                     <img src="assets/img/card_images/{{card.index}}.png" class = "cardImage"/>
                 </div>
                     <div>
-                        <button pButton type="button" label="Select"></button>
+                        <button pButton type="button" label="Select" (click)="makeMove()" [disabled]="!startingTurns"></button>
                     </div>
         </div>
     </ng-template>
@@ -56,7 +51,7 @@
 </div>
 </div>
 
-<div *ngIf="hideAllForms">
+<div *ngIf="!hideAllForms" class = "allForms">
   <form [formGroup]="partnerForm" *ngIf="gameOn && !hideCardForms" class = "formClass">
     <h4 class = "heading">Choose Partner card ({{chosenCards + 1}})</h4>
     <div>
@@ -67,7 +62,7 @@
   </div>
   <button type="submit" (click)="submitCard()" pButton label="Select" class="bigButton"></button>
   </form>
-  <div *ngIf="gameOn && !hideTrump" class = "formClass">
+  <div *ngIf="gameOn && !hideTrump" class = "formClass" id = "trumpForm">
     <h4 class = "heading">Choose Trump</h4>
     <p-dropdown [options] = "suiteArray" placeholder = "Select trump" [formControl]="trump">
     </p-dropdown>

@@ -28,19 +28,6 @@ app.post('/signup', (req, res)=>{
   res.status(200).send({message: "success", username: name});
 });
 
-app.post('/getPartner', (req, res)=> {
-  let game = ongoingGames.find(g => g.gameRoom === req.body.roomName);
-  for(let i=0; i< game.allPlayers.length; i++) {
-    let p = game.allPlayers[i];
-    let card = p.hand.find(c => c.suite === req.body.suite && c.value === req.body.card);
-    if(card) {
-      game.teamA.add(p.id);
-      break;
-    }
-  }
-  res.status.send(200).send({message: "success"});
-});
-
 app.get('*', (req,res) => {
     res.sendFile(path.join(__dirname, '..', 'dist/Spades250/index.html'));
 });
@@ -92,7 +79,7 @@ io.on('connection', (socket)=>{
 
   socket.on('startgame', (data, callback)=>{
     let room = roomList.find(room => room.name === data.roomName);
-    if(room && room.connections >= 1) {
+    if(room && room.connections >= 4) {
       room.gameOn = true;
       io.sockets.in(room.name).emit('toast', {message: 'Game Started!'});
       const game = new Game();
@@ -106,8 +93,9 @@ io.on('connection', (socket)=>{
       game.bid = 150;
       game.gameRoom = room.name;
       game.bidder = game.allPlayers[starter].name;
+      console.log(game.bidder);
       ongoingGames.push(game);
-        io.to(game.allPlayers[starter].id).emit('bid', {value: 150, name: game.allPlayers[starter].name});
+      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.allPlayers[starter].name}'s opening bid of 150`});
     }
     else {
       io.to(socket.id).emit('toast', {message: 'Waiting for 4 or more players to join'});
@@ -115,9 +103,7 @@ io.on('connection', (socket)=>{
   });
 
   socket.on('newBid', (data, callback)=> {
-    let game = ongoingGames.find((g)=> {
-      g.gameRoom === data.roomName
-    });
+    let game = ongoingGames.find(g=> g.gameRoom === data.roomName );
     if(data.bid > game.bid) {
       game.bid = data.bid;
       game.bidder = game.allPlayers.find((player)=> {
@@ -132,9 +118,7 @@ io.on('connection', (socket)=>{
   });
 
   socket.on('noChallenge', (data, callback)=>{
-    let game  = ongoingGames.find((g)=> {
-      return g.gameRoom === data.roomName;
-    });
+    let game = ongoingGames.find(g=> g.gameRoom === data.roomName );
     game.noChallenges++;
     if(game.noChallenges === game.allPlayers.length-1){
       io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s bid of ${game.bid} has been accepted`});
@@ -144,16 +128,29 @@ io.on('connection', (socket)=>{
     callback({message: "success"});
   });
 
+  socket.on('partnerCard', (data, callback)=>{
+    let game = ongoingGames.find(g => g.gameRoom === data.roomName);
+    for(let i=0; i< game.allPlayers.length; i++) {
+      let p = game.allPlayers[i];
+      let card = p.hand.find(c => c.suite === data.data.suite && c.value === data.data.card);
+      if(card) {
+        game.teamA.add(p.id);
+        break;
+      }
+    }
+      socket.broadcast.to(game.gameRoom).emit('toast', {message: `${game.bidder.name} has chosen ${data.data.card} of ${data.data.suite} as Partner`});
+    callback({message: "success"});
+  });
+
   socket.on('startPlaying', (data, callback)=>{
-    let game  = ongoingGames.find((g)=> {
-      return g.gameRoom === data.roomName;
-    });
+    let game = ongoingGames.find(g=> g.gameRoom === data.roomName );
     game.allPlayers.forEach((p) => {
       if(!game.teamA.has(p.id)) {
         game.teamB.add(p.id);
       }
     });
     io.sockets.in(game.gameRoom).emit('toast', {message: `Starting the Game! ${game.bidder.name}'s turn`});
+    io.sockets.in(game.gameRoom).emit('startingTurns');
     io.to(game.bidder.id).emit('turn');
   });
 

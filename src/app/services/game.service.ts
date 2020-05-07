@@ -39,4 +39,8 @@ export class GameService {
     return this.socket.fromEvent<any>('newMessage');
   }
 
+  public startingTurns(): Observable<any>{
+    return this.socket.fromEvent<any>('startingTurns');
+  }
+
 }
