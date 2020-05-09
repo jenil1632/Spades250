@@ -88,7 +88,7 @@ export class BoardComponent implements OnInit {
 
       this.myBid = new FormControl(null);
       this.trump = new FormControl(null, Validators.required);
-      this.move = new FormControl(null, [Validators.required, this.validateMove]);
+      this.move = new FormControl(null);
       this.partnerForm = new FormGroup({
         suite: new FormControl(null, Validators.required),
         card: new FormControl(null, Validators.required)
@@ -180,8 +180,10 @@ export class BoardComponent implements OnInit {
 
   submitCard() {
     if(this.partnerForm.valid){
-      this.socket.emit('partnerCard', {roomName: this.room, data: this.partnerForm.value}, (res)=> {
+      let label = this.cardArray.find(c=> c.value === this.partnerForm.get('card').value).label;
+      this.socket.emit('partnerCard', {roomName: this.room, data: this.partnerForm.value, label: label}, (res)=> {
         if(res.message === 'success'){
+          this.messageService.add({severity: 'success', summary: 'Partners set', life: 2000});
           this.chosenCards++;
           if(this.chosenCards !== this.partners) {
             this.partnerForm.reset();
@@ -194,9 +196,6 @@ export class BoardComponent implements OnInit {
               });
             }
           }
-          this.socket.emit('myPartner', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), data: this.partnerForm.value}, (res)=> {
-            this.messageService.add({severity: 'success', summary: 'Partners set', life: 2000});
-          });
         }
       });
     }
@@ -216,8 +215,9 @@ export class BoardComponent implements OnInit {
     }
   }
 
-  makeMove() {
-    if(this.move.valid) {
+  makeMove(card) {
+    this.move.setValue(card);
+    if(this.validateMove(card)) {
       this.socket.emit('move', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), move: this.move.value, turnIndex: this.turnIndex}, (res)=>{
         this.myCards = this.myCards.filter(c => {
           return !(c.suite === this.move.value.suite && c.value === this.move.value.value);
@@ -226,21 +226,20 @@ export class BoardComponent implements OnInit {
     }
   }
 
-  validateMove(control: FormControl) {
-    if (control.value) {
-      if(control.value.suite === this.turnSuite) {
-        return null;
-      } else {
-        for(let i=0; i<this.myCards.length; i++) {
-          if(this.myCards[i].suite === this.turnSuite) {
-            return {
-              error: 'Not a valid move'
-            };
+  validateMove(card) {
+      if(this.turnSuite) {
+        if(card.suite === this.turnSuite) {
+          return true;
+        } else {
+          for(let i=0; i<this.myCards.length; i++) {
+            if(this.myCards[i].suite === this.turnSuite) {
+              return false;
+            }
           }
         }
+      } else {
+        return true;
       }
-    }
-    return null;
   }
 
   setCarouselParams() {

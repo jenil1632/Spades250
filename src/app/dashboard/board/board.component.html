@@ -27,7 +27,7 @@
                     <img src="assets/img/card_images/{{card.index}}.png" class = "cardImage"/>
                 </div>
                     <div>
-                        <button pButton type="button" label="Select" (click)="makeMove()" [disabled]="!startingTurns"></button>
+                        <button pButton type="button" label="Select" (click)="makeMove(card)" [disabled]="!startingTurns"></button>
                     </div>
         </div>
     </ng-template>

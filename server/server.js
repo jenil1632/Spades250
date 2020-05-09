@@ -92,10 +92,10 @@ io.on('connection', (socket)=>{
       let starter = Math.floor(Math.random()*room.connections);
       game.bid = 150;
       game.gameRoom = room.name;
-      game.bidder = game.allPlayers[starter].name;
+      game.bidder = game.allPlayers[starter];
       console.log(game.bidder);
       ongoingGames.push(game);
-      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.allPlayers[starter].name}'s opening bid of 150`});
+      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s opening bid of 150`});
     }
     else {
       io.to(socket.id).emit('toast', {message: 'Waiting for 4 or more players to join'});
@@ -109,7 +109,13 @@ io.on('connection', (socket)=>{
       game.bidder = game.allPlayers.find((player)=> {
         return player.name === data.username;
       });
-      socket.broadcast.emit('bid', {value: game.bid, name: game.bidder.name});
+      if(game.noChallenges === game.allPlayers.length-1) {
+        io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s bid of ${game.bid} has been accepted. Waiting for ${game.bidder.name} to choose partner`});
+        io.to(game.bidder.id).emit('chooseCards', {no: game.allPlayers.length/2 -1});
+        game.teamA.add(game.bidder.id);
+      } else {
+        socket.broadcast.emit('bid', {value: game.bid, name: game.bidder.name});
+      }
       callback({message: 'success'});
     }
     else {
@@ -120,8 +126,8 @@ io.on('connection', (socket)=>{
   socket.on('noChallenge', (data, callback)=>{
     let game = ongoingGames.find(g=> g.gameRoom === data.roomName );
     game.noChallenges++;
-    if(game.noChallenges === game.allPlayers.length-1){
-      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s bid of ${game.bid} has been accepted`});
+    if((game.noChallenges === game.allPlayers.length-1 && game.bid > 150) || (game.noChallenges === game.allPlayers.length && game.bid === 150)){
+      io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s bid of ${game.bid} has been accepted. Waiting for ${game.bidder.name} to choose partner`});
       io.to(game.bidder.id).emit('chooseCards', {no: game.allPlayers.length/2 -1});
       game.teamA.add(game.bidder.id);
     }
@@ -138,7 +144,7 @@ io.on('connection', (socket)=>{
         break;
       }
     }
-      socket.broadcast.to(game.gameRoom).emit('toast', {message: `${game.bidder.name} has chosen ${data.data.card} of ${data.data.suite} as Partner`});
+      socket.broadcast.to(game.gameRoom).emit('toast', {message: `${game.bidder.name} has chosen ${data.label} of ${data.data.suite} as Partner`});
     callback({message: "success"});
   });
 
