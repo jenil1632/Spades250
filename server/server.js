@@ -173,11 +173,15 @@ io.on('connection', (socket)=>{
     let game  = ongoingGames.find((g)=> {
       return g.gameRoom === data.roomName;
     });
+    if(game.moveCount === 0) {
+      io.sockets.in(game.gameRoom).emit('turnSuite', {suite: data.move.suite});
+    }
     io.sockets.in(game.gameRoom).emit('update', {from: data.username, move: data.move});
     game.moveCount++;
-    game.mat.push({id: socket.id, card: new Card(data.move.index, data.move.value, data.move.suite)});
+    game.mat.push({id: socket.id, card: new Card(data.move.index, data.move.value, data.move.suite, data.move.points)});
     if(game.moveCount === game.allPlayers.length) {
       game.completedTurns++;
+      io.sockets.in(game.gameRoom).emit('turnSuite', {suite: null});
       let turnWinner = game.evaluateTurn();
       game.resetAfterTurn();
       io.sockets.in(game.gameRoom).emit('toast', {message: `${turnWinner.name} won this turn`});
@@ -194,15 +198,16 @@ io.on('connection', (socket)=>{
         }, 5000);
       }
     } else {
-      if(data.index+1 >= game.allPlayers.length) {
+      if(data.turnIndex+1 >= game.allPlayers.length) {
         game.currentTurn = 0;
         io.to(game.allPlayers[game.currentTurn].id).emit('turn');
       } else {
-        game.currentTurn = data.index + 1;
-        io.to(game.allPlayers[game.currentTurn]).emit('turn');
+        game.currentTurn = data.turnIndex + 1;
+        io.to(game.allPlayers[game.currentTurn].id).emit('turn');
       }
       io.sockets.in(game.gameRoom).emit('toast', {message: `${game.allPlayers[game.currentTurn].name}'s turn`});
     }
+    callback({message: 'success'});
   });
 
   socket.on('createMessage', (data, callback)=>{

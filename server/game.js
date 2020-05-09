@@ -145,17 +145,27 @@ Game.prototype.isGameCompleted = function() {
 
 Game.prototype.evaluateGameWinner = function() {
   let bidderScore = 0;
-  this.teamA.forEach(p => {
+  let detailedTeamA = [];
+  let detailedTeamB = [];
+  this.teamA.forEach((id) => {
+    let player = this.allPlayers.find(p => p.id === id);
+    detailedTeamA.push(player);
+  });
+  this.teamB.forEach((id) => {
+    let player = this.allPlayers.find(p => p.id === id);
+    detailedTeamB.push(player);
+  });
+  detailedTeamA.forEach(p => {
     bidderScore += p.score;
   });
   if(bidderScore >= this.bid) {
     return {
-      winner: this.teamA,
+      winner: detailedTeamA,
       points: bidderScore
     };
   } else {
     return {
-      winner: this.teamB,
+      winner: detailedTeamB,
       points: 250 - bidderScore
     };
   }

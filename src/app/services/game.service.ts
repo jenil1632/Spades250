@@ -43,4 +43,8 @@ export class GameService {
     return this.socket.fromEvent<any>('startingTurns');
   }
 
+  public setTurnSuite(): Observable<any>{
+    return this.socket.fromEvent<any>('turnSuite');
+  }
+
 }

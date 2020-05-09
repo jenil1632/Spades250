@@ -25,10 +25,10 @@ create(){
   if(this.newRoomName.valid){
     this.socket.emit('createRoom', {roomName: this.newRoomName.value, username: sessionStorage.getItem('spadesUsername')}, (res)=> {
       if(res.message === 'success'){
-        this.messageService.add({severity: 'success', summary: 'Room created successfully', life: 3000});
+        this.messageService.add({severity: 'success', summary: 'Room created successfully', life: 2000});
         setTimeout(()=> {
           this.router.navigate(['/board'], {queryParams: {room: this.newRoomName.value, username: sessionStorage.getItem('spadesUsername')}});
-        }, 3000);
+        }, 2000);
       }
     });
   }

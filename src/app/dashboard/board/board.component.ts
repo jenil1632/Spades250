@@ -3,7 +3,6 @@ import { Socket } from 'ngx-socket-io';
 import { ActivatedRoute } from '@angular/router';
 import { GameService } from './../../services/game.service';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { SignupService } from './../../services/signup.service';
 import {MessageService} from 'primeng/api';
 
 @Component({
@@ -16,7 +15,7 @@ import {MessageService} from 'primeng/api';
 })
 export class BoardComponent implements OnInit {
 
-  constructor(private socket: Socket, private route: ActivatedRoute, private gameService: GameService, private signupService: SignupService, private messageService: MessageService) { }
+  constructor(private socket: Socket, private route: ActivatedRoute, private gameService: GameService, private messageService: MessageService) { }
 
   @ViewChild('conversation') private conversation: ElementRef;
   @ViewChild('messageList') private messages: ElementRef;
@@ -88,7 +87,6 @@ export class BoardComponent implements OnInit {
 
       this.myBid = new FormControl(null);
       this.trump = new FormControl(null, Validators.required);
-      this.move = new FormControl(null);
       this.partnerForm = new FormGroup({
         suite: new FormControl(null, Validators.required),
         card: new FormControl(null, Validators.required)
@@ -96,7 +94,6 @@ export class BoardComponent implements OnInit {
       this.message = new FormControl(null, [Validators.required, ]);
 
       this.gameService.getCards().subscribe((res)=>{
-        console.log(res);
         this.myCards = res.hand;
         this.turnIndex = res.index;
         this.gameOn = true;
@@ -144,6 +141,10 @@ export class BoardComponent implements OnInit {
 
      this.gameService.startingTurns().subscribe(()=>{
        this.startingTurns = true;
+     });
+
+     this.gameService.setTurnSuite().subscribe((res)=> {
+       this.turnSuite = res.suite;
      });
 
   }
@@ -216,12 +217,12 @@ export class BoardComponent implements OnInit {
   }
 
   makeMove(card) {
-    this.move.setValue(card);
     if(this.validateMove(card)) {
-      this.socket.emit('move', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), move: this.move.value, turnIndex: this.turnIndex}, (res)=>{
+      this.socket.emit('move', {roomName: this.room, username: sessionStorage.getItem('spadesUsername'), move: card, turnIndex: this.turnIndex}, (res)=>{
         this.myCards = this.myCards.filter(c => {
-          return !(c.suite === this.move.value.suite && c.value === this.move.value.value);
+          return !(c.suite === card.suite && c.value === card.value);
         });
+        this.myTurn = false;
       });
     }
   }
@@ -236,6 +237,7 @@ export class BoardComponent implements OnInit {
               return false;
             }
           }
+          return true;
         }
       } else {
         return true;
