@@ -1,5 +1,5 @@
   <div>
 <h3>Hello user, choose a username !</h3>
-<input type="text" placeholder="Type here" [formControl]="username" pInputText/>
+<input type="text" placeholder="Type here" [formControl]="username" pInputText (keyup.enter) = "onSubmit()"/>
 <button type="button" (click)="onSubmit()" pButton label="Submit"></button>
 </div>

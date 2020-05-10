@@ -20,7 +20,7 @@ export class BoardComponent implements OnInit {
   @ViewChild('conversation') private conversation: ElementRef;
   @ViewChild('messageList') private messages: ElementRef;
   room;
-  myCards;
+  myCards = [];
   minimumBid = 150;
   turnIndex;
   turnSuite = null;
@@ -30,7 +30,6 @@ export class BoardComponent implements OnInit {
   challenge = true;
   startingTurns = false;
   disableBid = false;
-  move: FormControl;
   partnerForm: FormGroup;
   trump: FormControl;
   suiteArray = [{value: 'spade', label: 'spade'}, {value: 'heart', label: 'heart'}, {value: 'club', label: 'club'}, {value: 'diamond', label: 'diamond'}];
@@ -76,6 +75,27 @@ export class BoardComponent implements OnInit {
                 numScroll: 1
             }
         ];
+
+  resetBoard() {
+    this.myCards = [];
+    this.minimumBid = 150;
+    this.turnIndex = 0;
+    this.turnSuite = null;
+    this.mat = [];
+    this.myBid.reset();
+    this.gameOn = false;
+    this.challenge = true;
+    this.startingTurns = false;
+    this.disableBid = false;
+    this.partnerForm.reset();
+    this.trump.reset();
+    this.partners = 0;
+    this.chosenCards = 0;
+    this.hideTrump = false;
+    this.hideCardForms = false;
+    this.myTurn = false;
+    this.hideAllForms = true;
+  }
 
   ngOnInit() {
     this.route.queryParams
@@ -123,7 +143,6 @@ export class BoardComponent implements OnInit {
         this.messageService.add({severity: 'info', summary: 'Choose trump and partner cards', life: 3000});
         this.partners = res.no;
         this.hideAllForms = false;
-// something to do ??
 });
 
      this.gameService.myTurn().subscribe(()=>{
@@ -145,6 +164,10 @@ export class BoardComponent implements OnInit {
 
      this.gameService.setTurnSuite().subscribe((res)=> {
        this.turnSuite = res.suite;
+     });
+
+     this.gameService.gameOver().subscribe((res)=> {
+       this.resetBoard();
      });
 
   }

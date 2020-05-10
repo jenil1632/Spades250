@@ -1,10 +1,10 @@
 <p-toast position="top-center"></p-toast>
 <p-panel header="Create Room" [toggleable]="true" collapsed = "true" class = "roomInput">
-  <input type="text" placeholder="Type here" [formControl]="newRoomName" pInputText/>
+  <input type="text" placeholder="Type here" [formControl]="newRoomName" pInputText (keyup.enter) = "create()"/>
   <button type="submit" (click)="create()" pButton label="Create"></button>
 </p-panel>
 
 <p-panel header="Join Room" [toggleable]="true" collapsed = "true" class = "roomInput">
-  <input type="text" placeholder="Type here" [formControl]="existingRoomName" pInputText/>
+  <input type="text" placeholder="Type here" [formControl]="existingRoomName" pInputText (keyup.enter) = "join()"/>
   <button type="submit" (click)="join()" pButton label="Join"></button>
 </p-panel>

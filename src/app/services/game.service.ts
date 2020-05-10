@@ -47,4 +47,8 @@ export class GameService {
     return this.socket.fromEvent<any>('turnSuite');
   }
 
+  public gameOver(): Observable<any>{
+    return this.socket.fromEvent<any>('gameover');
+  }
+
 }

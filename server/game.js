@@ -77,7 +77,7 @@ Game.prototype.initalizeCardArray = function() {
         }
       }
     }
-    this.cardArray[2].points = 30;
+    this.cardArray[1].points = 30;
 }
 
 Game.prototype.cardExistsInDeck = function (card){
@@ -95,7 +95,7 @@ Game.prototype.createPlayers = function(players, playerArray){
 }
 
 Game.prototype.distributeCards = function(players){
-    let handLength = this.cardArray.length / players;
+    let handLength = Math.trunc(this.cardArray.length / players);
     for(let i=0; i<players; i++){
       let count = 0;
       if(this.cardArray.length===handLength){
@@ -140,7 +140,7 @@ Game.prototype.resetAfterTurn = function() {
 }
 
 Game.prototype.isGameCompleted = function() {
-  return this.completedTurns === (52 / this.allPlayers.length);
+  return this.completedTurns === Math.trunc(52 / this.allPlayers.length);
 }
 
 Game.prototype.evaluateGameWinner = function() {

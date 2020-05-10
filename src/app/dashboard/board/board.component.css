@@ -120,8 +120,8 @@
 
 @media (min-width: 768px) {
   .mat {
-    max-width: 80%;
-    margin-bottom: 16px;
+    width: 800px;
+    min-height: 200px;
   }
   .bigScreen {
     display: block;
@@ -135,8 +135,5 @@
   }
   #trumpForm {
     min-width: 350px;
-  }
-  .mat {
-    min-height: 200px;
   }
 }

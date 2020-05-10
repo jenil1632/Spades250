@@ -7,7 +7,6 @@ const socketIO = require('socket.io');
 const http = require('http');
 const {Game} = require('./game.js');
 const {Card} = require('./models/card.js');
-//const {generateMessage} = require('./utils/message.js');
 
 
 const port = process.env.PORT || '3000';
@@ -33,7 +32,7 @@ app.get('*', (req,res) => {
 });
 
 
-//messaging app event listener
+
 io.on('connection', (socket)=>{
 
   console.log('new user Connected');
@@ -54,6 +53,9 @@ io.on('connection', (socket)=>{
 
 
   socket.on('createRoom', (data, callback)=>{
+    if (roomList.some(r=> r.name === data.roomName)) {
+      callback({message: 'failure'})
+    }
     socket.join(data.roomName);
     roomList.push({name: data.roomName, connections: 1, gameOn: false});
     playerArray.push({name: data.username, roomName: data.roomName, id: socket.id});
@@ -93,7 +95,6 @@ io.on('connection', (socket)=>{
       game.bid = 150;
       game.gameRoom = room.name;
       game.bidder = game.allPlayers[starter];
-      console.log(game.bidder);
       ongoingGames.push(game);
       io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s opening bid of 150`});
     }
@@ -111,7 +112,7 @@ io.on('connection', (socket)=>{
       });
       if(game.noChallenges === game.allPlayers.length-1) {
         io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s bid of ${game.bid} has been accepted. Waiting for ${game.bidder.name} to choose partner`});
-        io.to(game.bidder.id).emit('chooseCards', {no: game.allPlayers.length/2 -1});
+        io.to(game.bidder.id).emit('chooseCards', {no: Math.trunc(game.allPlayers.length/2) -1});
         game.teamA.add(game.bidder.id);
       } else {
         socket.broadcast.emit('bid', {value: game.bid, name: game.bidder.name});
@@ -128,7 +129,7 @@ io.on('connection', (socket)=>{
     game.noChallenges++;
     if((game.noChallenges === game.allPlayers.length-1 && game.bid > 150) || (game.noChallenges === game.allPlayers.length && game.bid === 150)){
       io.sockets.in(game.gameRoom).emit('toast', {message: `${game.bidder.name}'s bid of ${game.bid} has been accepted. Waiting for ${game.bidder.name} to choose partner`});
-      io.to(game.bidder.id).emit('chooseCards', {no: game.allPlayers.length/2 -1});
+      io.to(game.bidder.id).emit('chooseCards', {no: Math.trunc(game.allPlayers.length/2) -1});
       game.teamA.add(game.bidder.id);
     }
     callback({message: "success"});
@@ -190,12 +191,16 @@ io.on('connection', (socket)=>{
         let winnerList = '';
         winnerDetails.winner.forEach(p => winnerList += `${p.name}, `);
         io.sockets.in(game.gameRoom).emit('toast', {message: `Winning team is ${winnerList} with ${winnerDetails.points}`});
+        io.sockets.in(game.gameRoom).emit('gameover');
+        let room = roomList.find(room => room.name === data.roomName);
+        room.gameOn = false;
+        ongoingGames = ongoingGames.filter(g => g.gameRoom !== game.gameRoom);
         //reset game
       } else {
         setTimeout(()=>{
           io.sockets.in(game.gameRoom).emit('resetMat');
           io.to(turnWinner.id).emit('turn');
-        }, 5000);
+        }, 4000);
       }
     } else {
       if(data.turnIndex+1 >= game.allPlayers.length) {

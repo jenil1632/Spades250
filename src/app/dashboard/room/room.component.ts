@@ -29,6 +29,8 @@ create(){
         setTimeout(()=> {
           this.router.navigate(['/board'], {queryParams: {room: this.newRoomName.value, username: sessionStorage.getItem('spadesUsername')}});
         }, 2000);
+      } else {
+        this.messageService.add({severity: 'error', summary: `Room ${this.newRoomName.value} already exists`, life: 2000});
       }
     });
   }

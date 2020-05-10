@@ -2,7 +2,7 @@
 <button type="button" (click) = startGame() *ngIf="!gameOn" pButton label="Start game"></button>
 
 <div *ngIf="gameOn && !disableBid" class = "bidding">
-<input [formControl]="myBid" pInputText placeholder="Enter your Bid">
+<input [formControl]="myBid" pInputText placeholder="Enter your Bid" (keyup.enter) = "submitBid()"/>
 <button type="button" (click) = "submitBid()" pButton label="Bid" class="formButton" [disabled] = "disableBid"></button>
 <button type="button" (click) = "noChallenge()" pButton label="Pass" class="ui-button-danger formButton" [disabled] = "disableBid"></button>
 </div>
@@ -18,7 +18,7 @@
 </div>
 
 <div class = "userActionBar" *ngIf="gameOn">
-<div class = "handContainer">
+<div class = "handContainer" *ngIf="myCards.length>0">
   <h4 class="bigScreen">Hand</h4>
 <p-carousel [value]="myCards" [numVisible]="numVisible" [numScroll]="numScroll" [circular]="false" [responsiveOptions]="responsiveOptions" dotsContainerClass = "noDisplay">
     <ng-template let-card pTemplate="item">
@@ -45,7 +45,7 @@
   </ul>
   </div>
   <div class = "input-bar">
-  <textarea class = "input-box" placeholder="Type your message here" style="padding: 4px; flex-grow: 1" [formControl] = "message"></textarea>
+  <textarea class = "input-box" placeholder="Type your message here" style="padding: 4px; flex-grow: 1" [formControl] = "message" (keyup.enter) = "postMessage()"></textarea>
   <button type="button" pButton (click) = "postMessage()" label = ">"></button>
 </div>
 </div>
