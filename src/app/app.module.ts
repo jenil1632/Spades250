@@ -24,7 +24,10 @@ import {CardModule} from 'primeng/card';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 
-const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
+let hostname = window.location.hostname;
+let url = ( hostname === 'localhost' ) ? `${window.location.protocol}//${hostname}:3000` : undefined;
+const config: SocketIoConfig = { url: url, options: {} };
+
 
 @NgModule({
   declarations: [
