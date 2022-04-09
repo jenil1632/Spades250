@@ -24,7 +24,7 @@
     "core-js": "^2.5.4",
     "express": "^4.17.1",
     "merge-json": "0.1.0-b.3",
-    "moment": "^2.25.1",
+    "moment": "^2.29.2",
     "ngx-socket-io": "^3.0.1",
     "primeicons": "^2.0.0",
     "primeng": "^9.0.6",
