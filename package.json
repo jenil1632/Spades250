@@ -22,7 +22,7 @@
     "@angular/router": "~9.1.4",
     "body-parser": "^1.19.0",
     "core-js": "^2.5.4",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "merge-json": "0.1.0-b.3",
     "moment": "^2.25.1",
     "ngx-socket-io": "^3.0.1",
