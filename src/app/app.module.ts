@@ -25,7 +25,7 @@ import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 
 let hostname = window.location.hostname;
-let url = ( hostname === 'localhost' ) ? `${window.location.protocol}//${hostname}:3000` : undefined;
+let url = ( hostname === 'localhost' ) ? `${window.location.protocol}//${hostname}:8080` : undefined;
 const config: SocketIoConfig = { url: url, options: {} };
 
 
